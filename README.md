@@ -1,0 +1,2 @@
+# oradex
+Oracle DDL Extractor
