@@ -93,8 +93,7 @@ BEGIN
         ( DBMS_METADATA.SESSION_TRANSFORM, 'PRETTY', TRUE );
 END; `, constraintsArg, forceArg, storageArg, storageArg)
 
-	_, err = db.Exec(query)
-
+	_, err := db.Exec(query)
 	if err != nil {
 		return false, err
 	}
@@ -161,7 +160,7 @@ func ObjDDL(db *sql.DB, schema, name, objType string) (string, error) {
 
 	rows, err := db.Query("SELECT dbms_metadata.get_ddl ( :1, :2, :3 ) FROM DUAL", ddlType, name, schema)
 	if err != nil {
-		return DDL, err
+		return "", err
 	}
 	defer func() {
 		if cerr := rows.Close(); cerr != nil && err == nil {
@@ -199,7 +198,7 @@ func ObjDDL(db *sql.DB, schema, name, objType string) (string, error) {
 }
 
 // ObjTriggers returns the triggers for the specified object.
-func ObjTriggers(db *sql.DB, schema, name, objType string, flagQuiet bool) (string, error) {
+func ObjTriggers(db *sql.DB, schema, name, objType string, quiet bool) (string, error) {
 
 	var triggers []string
 	//triggers = append(triggers, "")
@@ -227,7 +226,7 @@ SELECT dbms_metadata.get_ddl ( 'TRIGGER', trigger_name, owner )
 	for rows.Next() {
 		err = rows.Scan(&rslt)
 		if err != nil {
-			return DDL, err
+			return "", err
 		}
 
 		rslt = trimString(rslt)
@@ -248,7 +247,7 @@ SELECT dbms_metadata.get_ddl ( 'TRIGGER', trigger_name, owner )
 				rslt = fmt.Sprintf("%s ON \"%s\".%s", s[0], schema, s[1])
 			}
 		} else {
-			carp(flagQuiet, errors.New(fmt.Sprintf("Funky triggers for %q.%q??\n", schema, name)))
+			carp(quiet, errors.New(fmt.Sprintf("Funky triggers for %q.%q??\n", schema, name)))
 		}
 
 		// Remove any excess trailing white space from the end of the PL/SQL block
@@ -272,7 +271,7 @@ SELECT dbms_metadata.get_ddl ( 'TRIGGER', trigger_name, owner )
 
 // ExportDDL pulls together, and returns, the DDL for the specified
 // object and all *supporting* objects and grants.
-func ExportDDL(db *sql.DB, schema, name, objType string, flagQuiet, neededGrants, objectGrants bool) (string, error) {
+func ExportDDL(db *sql.DB, schema, name, objType string, quiet, neededGrants, objectGrants bool) (string, error) {
 
 	var grants string
 	var objDDL string
@@ -280,9 +279,9 @@ func ExportDDL(db *sql.DB, schema, name, objType string, flagQuiet, neededGrants
 	var err error
 
 	if objType == typeTable || objType == typeView || objType == typeMaterializedView {
-		objDDL, err = exportTableView(db, schema, name, objType, flagQuiet)
+		objDDL, err = exportTableView(db, schema, name, objType, quiet)
 	} else {
-		//objDDL, err = exportOther(db, schema, name, objType, flagQuiet)
+		//objDDL, err = exportOther(db, schema, name, objType, quiet)
 		objDDL, err = ObjDDL(db, schema, name, objType)
 	}
 	if err != nil {
@@ -291,7 +290,7 @@ func ExportDDL(db *sql.DB, schema, name, objType string, flagQuiet, neededGrants
 
 	if neededGrants {
 		grants, err = ObjNeededPrivs(db, schema, name, objType)
-		carp(flagQuiet, err)
+		carp(quiet, err)
 		l = appendLine(l, grants)
 	}
 
@@ -300,7 +299,7 @@ func ExportDDL(db *sql.DB, schema, name, objType string, flagQuiet, neededGrants
 	// Grants
 	if objectGrants {
 		objDDL, err = ObjGrantedPrivs(db, schema, name, objType)
-		carp(flagQuiet, err)
+		carp(quiet, err)
 		l = appendLine(l, objDDL)
 	}
 
@@ -308,7 +307,7 @@ func ExportDDL(db *sql.DB, schema, name, objType string, flagQuiet, neededGrants
 	return DDL, err
 }
 
-func exportTableView(db *sql.DB, schema, name, objType string, flagQuiet bool) (string, error) {
+func exportTableView(db *sql.DB, schema, name, objType string, quiet bool) (string, error) {
 
 	var l []string
 
@@ -325,7 +324,7 @@ func exportTableView(db *sql.DB, schema, name, objType string, flagQuiet bool) (
 	// Indices
 	if objType == typeTable || objType == typeMaterializedView {
 		objDDL, err = ObjIndices(db, schema, name, objType)
-		carp(flagQuiet, err)
+		carp(quiet, err)
 		l = appendLine(l, objDDL)
 	}
 
@@ -340,26 +339,26 @@ func exportTableView(db *sql.DB, schema, name, objType string, flagQuiet bool) (
 
 	// Comments
 	objDDL, err = ObjComments(db, schema, name, objType)
-	carp(flagQuiet, err)
+	carp(quiet, err)
 	l = appendLine(l, objDDL)
 
 	// Column Comments
 	objDDL, err = ColComments(db, schema, name, objType)
-	carp(flagQuiet, err)
+	carp(quiet, err)
 	l = appendLine(l, objDDL)
 
 	// Triggers
-	objDDL, err = ObjTriggers(db, schema, name, objType, flagQuiet)
-	carp(flagQuiet, err)
+	objDDL, err = ObjTriggers(db, schema, name, objType, quiet)
+	carp(quiet, err)
 	l = appendLine(l, objDDL)
 
 	DDL := strings.Join(l, dblSpace())
 	return DDL, err
 }
 
-func carp(flagQuiet bool, err error) {
+func carp(quiet bool, err error) {
 	if err != nil {
-		if !flagQuiet {
+		if !quiet {
 			log.Println(err)
 		}
 	}
@@ -372,7 +371,7 @@ func runQuery(db *sql.DB, query, schema, name string) (string, error) {
 
 	rows, err := db.Query(query, schema, name)
 	if err != nil {
-		return r, err
+		return "", err
 	}
 	defer func() {
 		if cerr := rows.Close(); cerr != nil && err == nil {
@@ -383,7 +382,7 @@ func runQuery(db *sql.DB, query, schema, name string) (string, error) {
 	for rows.Next() {
 		err = rows.Scan(&rslt)
 		if err != nil {
-			return r, err
+			return "", err
 		}
 
 		l = appendLine(l, rslt)
