@@ -318,7 +318,7 @@ func exportTableView(db *sql.DB, schema, name, objType string, quiet bool) (stri
 	}
 
 	// Split the CREATE DDL from the ALTER DDL so they may be output separately
-	s := regexp.MustCompile("[\n\r\t ]+ALTER ").Split(objDDL, -1)
+	s := regexp.MustCompile("[\n\r\t ]*ALTER ").Split(objDDL, -1)
 	l = appendLine(l, s[0])
 
 	// Indices
