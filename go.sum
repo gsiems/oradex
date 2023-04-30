@@ -2,11 +2,13 @@ github.com/go-logfmt/logfmt v0.5.0 h1:TrB8swr/68K7m9CcGut2g3UOihhbcbiMAYiuTXdEih
 github.com/go-logfmt/logfmt v0.5.0/go.mod h1:wCYkCAKZfumFQihp8CzCvQ3paCTfi41vtzG1KdI/P7A=
 github.com/godror/godror v0.22.2 h1:6IOpg0KXVxHpELJHF1WRG75XWAvevqSaGHZubkAMaN0=
 github.com/godror/godror v0.22.2/go.mod h1:YlPoIf962ZZKPM5Xqa8NxmGgck39pi51tqAs+K3IaFM=
+github.com/google/go-cmp v0.4.0 h1:xsAVV57WRhGj6kEIi8ReJzQlHHqcBYCElAvkovg3B/4=
 github.com/google/go-cmp v0.4.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
-github.com/gsiems/orapass v0.0.0-20201214194444-feb6a2e6ac15 h1:6+EC65c+RVIKPygprgK2Nt4EAr24ErVcFu3QcgyYISc=
-github.com/gsiems/orapass v0.0.0-20201214194444-feb6a2e6ac15/go.mod h1:WOTnIO8ff/CfNj1ptvYOyX2amKplXDdQokuHx52b6VQ=
+github.com/gsiems/orapass v1.0.0 h1:DI2ostGFpyJzRHjLdyF2Ck0uC+dfFnzJCbhLTiye2ow=
+github.com/gsiems/orapass v1.0.0/go.mod h1:WOTnIO8ff/CfNj1ptvYOyX2amKplXDdQokuHx52b6VQ=
 github.com/phayes/permbits v0.0.0-20190612203442-39d7c581d2ee h1:P6U24L02WMfj9ymZTxl7CxS73JC99x3ukk+DBkgQGQs=
 github.com/phayes/permbits v0.0.0-20190612203442-39d7c581d2ee/go.mod h1:3uODdxMgOaPYeWU7RzZLxVtJHZ/x1f/iHkBZuKJDzuY=
+golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e h1:vcxGaoTs7kV8m5Np9uUNQin4BrLOthgV7252N8V+FwY=
 golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543 h1:E7g+9GITq07hpfrRu66IVDexMakfv52eLZ2CXBWiKr4=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
