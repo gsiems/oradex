@@ -177,7 +177,8 @@ func ObjDDL(db *sql.DB, schema, name, objType string) (string, error) {
 
 		DDL = trimString(DDL)
 
-		if objType == typeView || objType == typeMaterializedView {
+		switch objType {
+		case typeView, typeMaterializedView:
 			// Ensure that there is a semicolon at the end of views and
 			// materialized views-- these don't appear to work correctly if
 			// the last line is a comment
@@ -188,7 +189,7 @@ func ObjDDL(db *sql.DB, schema, name, objType string) (string, error) {
 				s = append(s, ";")
 				DDL = strings.Join(s, newLine())
 			}
-		} else {
+		default:
 			// Remove any excess trailing white space from the end of PL/SQL blocks
 			DDL = regexp.MustCompile("[\n\r\t ]+/\n").ReplaceAllString(DDL, "\n/\n")
 		}
@@ -278,10 +279,10 @@ func ExportDDL(db *sql.DB, schema, name, objType string, quiet, neededGrants, ob
 	var l []string
 	var err error
 
-	if objType == typeTable || objType == typeView || objType == typeMaterializedView {
+	switch objType {
+	case typeTable, typeView, typeMaterializedView:
 		objDDL, err = exportTableView(db, schema, name, objType, quiet)
-	} else {
-		//objDDL, err = exportOther(db, schema, name, objType, quiet)
+	default:
 		objDDL, err = ObjDDL(db, schema, name, objType)
 	}
 	if err != nil {
@@ -322,7 +323,8 @@ func exportTableView(db *sql.DB, schema, name, objType string, quiet bool) (stri
 	l = appendLine(l, s[0])
 
 	// Indices
-	if objType == typeTable || objType == typeMaterializedView {
+	switch objType {
+	case typeTable, typeMaterializedView:
 		objDDL, err = ObjIndices(db, schema, name, objType)
 		carp(quiet, err)
 		l = appendLine(l, objDDL)
